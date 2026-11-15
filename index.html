@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ProTech Command Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0507;--red:#e11d2e;--red2:#ff4d5e;--deep:#6b0a14;--ink:#f7eef0;--mute:#b9a3a8;--glass:rgba(255,255,255,.055);--g1:225,29,46;--g2:160,10,30;--g3:255,120,130;--edge:rgba(var(--g3),.22);--sb:272px;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{font-family:'Sora',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;font-size:14px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(60vw 50vh at 85% -5%,rgba(var(--g1),.38),transparent 70%),radial-gradient(50vw 50vh at -5% 105%,rgba(var(--g2),.45),transparent 70%),radial-gradient(30vw 30vh at 55% 60%,rgba(var(--g1),.08),transparent 70%)}
+.app{display:flex;height:100%;padding:max(14px,env(safe-area-inset-top,0px)) 14px max(14px,env(safe-area-inset-bottom,0px));gap:14px}
+.glass{background:var(--glass);border:1px solid var(--edge);border-radius:20px;backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 20px 50px rgba(0,0,0,.45)}
+aside{width:var(--sb);flex:none;padding:22px 14px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.brand{padding:4px 12px 20px}
+.brand b{display:block;font-size:22px;font-weight:700;letter-spacing:.02em}
+.brand b i{font-style:normal;color:var(--red2)}
+.brand span{color:var(--mute);font-size:12px}
+nav button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:14px;color:var(--mute);cursor:pointer;transition:background .2s,color .2s}
+nav button:hover{background:rgba(255,255,255,.06);color:var(--ink)}
+nav button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[contenteditable]:focus-visible{outline:2px solid var(--red2);outline-offset:2px}
+nav button .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.5;flex:none}
+nav button.on{color:#fff;background:linear-gradient(135deg,var(--red),var(--deep));box-shadow:0 8px 24px rgba(var(--g1),.35),inset 0 1px 0 rgba(255,255,255,.25)}
+nav button.on .dot{opacity:1;box-shadow:0 0 10px #fff}
+.sbfoot{margin-top:auto;padding:14px 12px 0;color:var(--mute);font-size:12px;display:flex;flex-direction:column;gap:10px}
+#kbtn{text-align:center}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{all:unset;width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.sw button.on{border-color:#fff}
+.sw button:focus-visible,.chip:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;border:1px solid var(--edge);background:rgba(0,0,0,.2);margin-bottom:8px}
+.item .grow{flex:1;min-width:0}
+.item small{color:var(--mute);display:block}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.chip{all:unset;box-sizing:border-box;cursor:pointer;padding:6px 14px;border-radius:99px;border:1px solid var(--edge);color:var(--mute);font-size:12px}
+.chip.on{background:var(--red);color:#fff;border-color:transparent}
+.empty{color:var(--mute);padding:18px;text-align:center;border:1.5px dashed rgba(var(--g3),.3);border-radius:14px}
+.pal{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;padding-top:14vh;background:rgba(0,0,0,.55);z-index:50}
+.board{display:flex;gap:14px;align-items:flex-start;overflow-x:auto;padding:2px 2px 16px}
+.col{flex:none;width:280px;padding:14px;max-height:calc(100vh - 210px);display:flex;flex-direction:column}
+.chd{display:flex;gap:6px;align-items:center;margin-bottom:10px}
+.chd input{flex:1;min-width:0;background:transparent;border-color:transparent;font-weight:600;padding:6px 8px}
+.chd input:hover,.chd input:focus{background:rgba(0,0,0,.35);border-color:var(--edge)}
+.chd span{color:var(--mute);font-size:12px}
+.cards{overflow-y:auto;min-height:24px;flex:1}
+.tcard{display:flex;gap:2px;align-items:flex-start;padding:10px 8px 10px 12px;border-radius:12px;border:1px solid var(--edge);border-left:4px solid var(--lc,transparent);background:rgba(0,0,0,.28);margin-bottom:8px;cursor:grab}
+.tcard .tx{flex:1;min-width:0;padding-top:1px;overflow-wrap:anywhere}
+.tcard .xbtn{padding:2px 5px}
+.addc{display:flex;gap:6px;margin-top:8px}
+.addc input{min-width:0;padding:8px 10px}
+.addc .btn{padding:8px 12px}
+.pal.on{display:flex}
+.pal .box{width:min(520px,92vw);padding:12px;background:rgba(25,8,12,.9)}
+.pal input{margin-bottom:8px}
+.pal ul{margin:0;padding:0;max-height:300px;overflow:auto}
+.pal li{list-style:none;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--mute)}
+.pal li.sel,.pal li:hover{background:rgba(255,255,255,.08);color:#fff}
+main{flex:1;min-width:0;overflow-y:auto;padding:4px 6px 30px}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;padding:14px 8px 20px;flex-wrap:wrap}
+h1{margin:0;font-size:30px;font-weight:700;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--mute)}
+.pill{padding:8px 14px;border-radius:99px;font-size:12px;color:var(--mute)}
+section{display:none}
+section.on{display:block}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{padding:22px}
+.card h3{margin:0 0 4px;font-size:16px;font-weight:600}
+.card p.sub{margin:0 0 16px;color:var(--mute);font-size:13px}
+label{display:block;font-size:12px;color:var(--mute);margin:12px 0 5px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:rgba(0,0,0,.35);border:1px solid var(--edge);border-radius:12px;padding:10px 12px}
+select option{background:#1a0a0d}
+textarea{min-height:240px;resize:vertical;line-height:1.6}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:130px}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;padding:10px 18px;border-radius:12px;font-weight:600;font-size:13px;color:#fff;background:linear-gradient(135deg,var(--red),var(--deep));box-shadow:0 8px 20px rgba(var(--g1),.3),inset 0 1px 0 rgba(255,255,255,.25);transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.15)}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:var(--glass);box-shadow:none;border:1px solid var(--edge)}
+.bar{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.stat{padding:18px 20px}
+.stat small{color:var(--mute);display:block}
+.stat strong{font-size:26px;font-weight:600}
+.stat.hot strong{color:var(--red2)}
+.ph{border:1.5px dashed rgba(var(--g3),.35);border-radius:16px;padding:26px;color:var(--mute);text-align:center;min-height:120px;display:flex;align-items:center;justify-content:center}
+.link{display:block;padding:20px;text-decoration:none;color:var(--ink);transition:transform .2s,border-color .2s}
+.link:hover{transform:translateY(-3px);border-color:var(--red2)}
+.link b{display:block;margin-bottom:4px}
+.link span{color:var(--mute);font-size:12px}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px}
+th,td{padding:10px;border-bottom:1px solid rgba(var(--g3),.14);text-align:left}
+th{color:var(--mute);font-weight:400;font-size:12px;background:rgba(0,0,0,.2)}
+td[contenteditable]{min-width:92px;border-radius:8px;transition:background .15s}
+td[contenteditable]:hover{background:rgba(255,255,255,.05)}
+td.name{font-weight:600;white-space:nowrap}
+.scroll{overflow-x:auto}
+.xbtn{all:unset;cursor:pointer;color:var(--mute);padding:4px 8px;border-radius:8px}
+.xbtn:hover{color:var(--red2);background:rgba(255,255,255,.06)}
+.exrow{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px}
+.toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;transform:translate(-50%,20px);opacity:0;padding:10px 18px;border-radius:99px;background:rgba(20,6,9,.9);border:1px solid var(--red2);transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:820px){body{overflow:auto}.app{flex-direction:column;height:auto;min-height:100%}aside{width:100%;flex-direction:row;overflow-x:auto;padding:12px}.brand{display:none}.sbfoot{margin:0 0 0 8px;padding:0;flex-direction:row;align-items:center;flex:none}.sbfoot small,#kbtn{display:none}.grid{grid-template-columns:1fr!important}nav{display:flex;gap:6px}nav button{white-space:nowrap;width:auto}main{overflow:visible}.exrow{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="glass">
+  <div class="brand"><b>Pro<i>Tech</i></b><span>Security Solutions · Command Dashboard</span></div>
+  <nav id="nav"></nav>
+  <div class='sbfoot'><small>Accent theme</small><div class='sw' id='sw'></div><button class='btn ghost' id='kbtn'>Quick search: Ctrl+K</button></div>
+</aside>
+<main>
+<header class="top">
+  <div><h1 id="title"></h1><p id="desc"></p></div>
+  <div class="pill glass" id="clock"></div>
+</header>
+
+<section id="welcome">
+  <div class="grid">
+    <div class="card glass">
+      <h3>Compose email</h3><p class="sub">Pick a division, add the new member, copy the result.</p>
+      <label>Division</label>
+      <select id="w-div"><option>Cash-In-Transit</option><option>Technical Services</option><option>Patrol &amp; Response</option><option>Training &amp; Recruitment</option></select>
+      <div class="row"><div><label>New member name</label><input id="w-name" placeholder="Full name"></div><div><label>Sent by</label><input id="w-from" placeholder="Your name and rank"></div></div>
+      <label>Resource link (placeholder)</label><input id="w-link" placeholder="https://">
+      <div class="bar"><button class="btn" data-copy="w-out">Copy email</button></div>
+    </div>
+    <div class="card glass"><h3>Preview</h3><p class="sub">Edit freely before copying.</p><textarea id="w-out"></textarea></div>
+  </div>
+</section>
+
+<section id="declarations">
+  <div class="grid">
+    <div class="card glass">
+      <h3>Template</h3><p class="sub">Placeholder templates, replace the wording with your handbook text.</p>
+      <label>Declaration</label>
+      <select id="d-type"><option value="0">Handbook acknowledgement</option><option value="1">Confidentiality declaration</option><option value="2">Code of conduct declaration</option></select>
+      <div class="row"><div><label>Member name</label><input id="d-name" placeholder="Full name"></div><div><label>Division</label><input id="d-div" placeholder="Division"></div></div>
+      <label>Date</label><input id="d-date" type="date">
+      <div class="bar"><button class="btn" data-copy="d-out">Copy declaration</button></div>
+    </div>
+    <div class="card glass"><h3>Preview</h3><p class="sub">Edit freely before copying.</p><textarea id="d-out"></textarea></div>
+  </div>
+</section>
+
+<section id="links">
+  <div class="grid" id="linkgrid"></div>
+</section>
+
+<section id="finance">
+  <div class="grid" style="margin-bottom:14px">
+    <div class="stat glass"><small>Net profit</small><strong id="f-net">$0</strong></div>
+    <div class="stat glass"><small>Profit margin</small><strong id="f-mar">0%</strong></div>
+    <div class="stat glass hot"><small>Tax owed</small><strong id="f-tax">$0</strong></div>
+  </div>
+  <div class="card glass" style="max-width:620px">
+    <h3>Financial calculator</h3><p class="sub">Revenue, costs and tax in one place.</p>
+    <div class="row"><div><label>Revenue ($)</label><input class="fin" id="f-rev" type="number" min="0" value="0"></div><div><label>Operating costs ($)</label><input class="fin" id="f-cost" type="number" min="0" value="0"></div></div>
+    <div class="row"><div><label>Payroll ($)</label><input class="fin" id="f-pay" type="number" min="0" value="0"></div><div><label>Tax rate (%)</label><input class="fin" id="f-rate" type="number" min="0" max="100" value="0"></div></div>
+  </div>
+</section>
+
+<section id="expenses">
+  <div class="grid" style="grid-template-columns:2fr 1fr">
+    <div class="card glass">
+      <h3>Expense list</h3><p class="sub">Add each item with a quantity and unit cost.</p>
+      <div id="exlist"></div>
+      <div class="bar"><button class="btn" id="exadd">Add expense</button><button class="btn ghost" id="exclear">Clear all</button></div>
+    </div>
+    <div class="stat glass hot" style="align-self:start"><small>Total expenses</small><strong id="ex-total">$0.00</strong></div>
+  </div>
+</section>
+
+<section id="schedule">
+  <div class="card glass">
+    <h3>Weekly schedule</h3><p class="sub">Click any cell to type a shift or note. Changes save automatically on this device.</p>
+    <div class="scroll"><table id="sch"></table></div>
+    <div class="bar"><button class="btn" id="sadd">Add employee row</button><button class="btn ghost" id="sdel">Remove last row</button><button class="btn ghost" id="sclear">Clear shifts</button></div>
+  </div>
+</section>
+<section id='broadcast'><div class='grid'>
+<div class='card glass'><h3>Compose broadcast</h3><p class='sub'>Send a notice to a Discord channel through its webhook.</p>
+<label>Webhook URL</label><input id='b-hook' placeholder='https://discord.com/api/webhooks/...' autocomplete='off'>
+<div class='row'><div><label>Sender name</label><input id='b-user'></div><div><label>Channel label</label><input id='b-chan' placeholder='e.g. #announcements'></div></div>
+<label>Title (optional)</label><input id='b-title'>
+<label>Message</label><textarea id='b-msg' style='min-height:150px'></textarea>
+<div class='bar'><button class='btn' id='b-send'>Send broadcast</button><button class='btn ghost' data-copy='b-msg'>Copy message</button></div>
+<p class='sub' id='b-stat' style='margin:12px 0 0'></p></div>
+<div class='card glass'><h3>Preview</h3><p class='sub'>How it will look in Discord.</p><div id='b-prev' class='item' style='display:block;border-left:4px solid var(--red)'></div></div>
+</div></section>
+<section id='vault'><div class='grid' style='grid-template-columns:2fr 1fr'>
+<div class='card glass'><h3>Documents</h3><p class='sub'>Search or filter by category.</p><input id='v-q' placeholder='Search documents' style='margin-bottom:12px'><div class='chips' id='v-chips'></div><div id='v-list'></div></div>
+<div class='card glass' style='align-self:start'><h3>Add document</h3><p class='sub'>Saved on this device.</p><label>Title</label><input id='v-t'><label>Category</label><select id='v-c'><option>Handbooks</option><option>Policies</option><option>Forms</option><option>Training</option></select><label>Link</label><input id='v-u' placeholder='https://'><div class='bar'><button class='btn' id='v-add'>Add document</button></div></div>
+</div></section>
+<section id='inbox'><div class='grid' style='grid-template-columns:1fr 2fr'>
+<div class='card glass' style='align-self:start'><h3>New request</h3><p class='sub'>Suggest an improvement or report a problem with this dashboard.</p><label>Type</label><select id='r-type'><option>Suggestion</option><option>Bug report</option><option>Feature request</option><option>Question</option><option>Other</option></select><label>Your name</label><input id='r-from' placeholder='Who’s sending this?'><label>Details</label><textarea id='r-det' style='min-height:110px'></textarea><div class='bar'><button class='btn' id='r-add'>Submit request</button></div></div>
+<div class='card glass'><h3>Submitted requests</h3><p class='sub' id='r-count'></p><div id='r-list'></div></div>
+</div></section>
+<section id='plans'><div class='board' id='board'></div></section>
+<section id='activity'><div class='card glass'><h3>Recent activity</h3><p class='sub'>Actions on this device, newest first.</p><div id='a-list'></div><div class='bar'><button class='btn ghost' id='a-clear'>Clear log</button></div></div></section>
+</main>
+</div>
+<div class='pal' id='pal'><div class='box glass'><input id='p-q' placeholder='Jump to a tab or switch theme' aria-label='Quick search' autocomplete='off'><ul id='p-list'></ul></div></div>
+<div class="toast" id="toast">Copied</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const tabs=[
+ ['welcome','Welcome to Division','Generate welcome emails for new division members.'],
+ ['declarations','Handbook Declarations','Templates members sign after reading the handbook.'],
+ ['links','Tool Links','Quick access to the rest of the ProTech toolkit.'],
+ ['finance','Financial Calculator','Revenue, costs, payroll and tax.'],
+ ['expenses','Expenses Calculator','Track and total expenses.'],
+ ['schedule','Scheduling Table','Plan the week for your team.'],
+ ['broadcast','Discord Broadcast','Send a notice to a Discord channel.'],
+ ['vault','Document Vault','Handbooks, policies and forms in one searchable place.'],
+ ['inbox','Dashboard Requests','Suggestions, bug reports and feature requests for this dashboard.'],
+ ['plans','Plans','Organize work on a board, Trello style.'],
+ ['activity','Activity Feed','A log of what you’ve done on this device.']
+];
+$('#nav').innerHTML=tabs.map(t=>`<button data-t="${t[0]}"><span class="dot"></span>${t[1]}</button>`).join('');
+function show(id){
+ tabs.forEach(t=>$('#'+t[0]).classList.toggle('on',t[0]===id));
+ $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===id));
+ const t=tabs.find(x=>x[0]===id);$('#title').textContent=t[1];$('#desc').textContent=t[2];
+ try{location.hash=id}catch(e){}
+}
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)};
+const tick=()=>{$('#clock').textContent=new Date().toLocaleString([], {weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})};tick();setInterval(tick,30000);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(!b)return;const el=$('#'+b.dataset.copy);el.select();
+ (navigator.clipboard?navigator.clipboard.writeText(el.value):Promise.reject()).then(()=>toast('Copied')).catch(()=>{try{document.execCommand('copy');toast('Copied')}catch(x){toast('Press Ctrl+C to copy')}})});
+
+/* Welcome */
+const wf=()=>{const n=$('#w-name').value||'[Member name]',d=$('#w-div').value,f=$('#w-from').value||'[Your name and rank]',l=$('#w-link').value||'[Resource link]';
+$('#w-out').value=`Subject: Welcome to the ${d} Division\n\nHello ${n},\n\nWelcome to the ${d} Division at ProTech Security Solutions. We’re glad to have you on the team.\n\nTo get started:\n- Read the division handbook in full\n- Sign the handbook declaration\n- Check the schedule for your first shift\n\nDivision resources: ${l}\n\nIf you have any questions, reach out to me directly.\n\nRegards,\n${f}\nProTech Security Solutions`};
+['#w-div','#w-name','#w-from','#w-link'].forEach(s=>$(s).addEventListener('input',wf));wf();
+
+/* Declarations */
+const dt=[
+['Handbook Acknowledgement','I confirm that I have read and understood the [Division] handbook and agree to follow every policy and procedure in it.'],
+['Confidentiality Declaration','I will keep all client, operational and internal information confidential, and will not share it outside ProTech without written approval.'],
+['Code of Conduct Declaration','I will act professionally at all times, represent ProTech with integrity, and follow the chain of command.']];
+const df=()=>{const t=dt[$('#d-type').value],n=$('#d-name').value||'[Member name]',v=$('#d-div').value||'[Division]',d=$('#d-date').value||'[Date]';
+$('#d-out').value=`${t[0].toUpperCase()}\nProTech Security Solutions · ${v}\n\n${t[1].replace('[Division]',v)}\n\nMember: ${n}\nDate: ${d}\nSignature: ____________________`};
+['#d-type','#d-name','#d-div','#d-date'].forEach(s=>$(s).addEventListener('input',df));df();
+
+/* Links */
+const L=[['Newsletter generator','Press releases and bulletins'],['Disciplinary and commendation','Notices and recognition'],['Incident report','Log and file incidents'],['Trainee feedback','Training reports'],['Client letter','Thank-you letters'],['Use of Force exam','Knowledge testing']];
+$('#linkgrid').innerHTML=L.map(l=>`<a class="link glass" href="#" onclick="return false"><b>${l[0]}</b><span>${l[1]}</span></a>`).join('')+`<div class="ph">Add your own tool link here</div>`;
+
+/* Finance */
+const $$$=v=>'$'+v.toLocaleString(undefined,{maximumFractionDigits:2});
+function fin(){const g=id=>+$(id).value||0,rev=g('#f-rev'),pre=rev-g('#f-cost')-g('#f-pay'),tax=Math.max(0,pre)*g('#f-rate')/100,net=pre-tax;
+$('#f-net').textContent=$$$(net);$('#f-tax').textContent=$$$(tax);$('#f-mar').textContent=(rev?net/rev*100:0).toFixed(1)+'%'}
+$$('.fin').forEach(i=>i.addEventListener('input',fin));
+
+/* Expenses */
+function exRow(n='',q=1,c=0){const d=document.createElement('div');d.className='exrow';
+d.innerHTML=`<input placeholder="Item" value="${n}"><input type="number" min="0" value="${q}" aria-label="Quantity"><input type="number" min="0" step="0.01" value="${c}" aria-label="Unit cost"><button class="xbtn" aria-label="Remove">✕</button>`;
+d.querySelector('button').onclick=()=>{d.remove();ex()};d.addEventListener('input',ex);$('#exlist').appendChild(d)}
+function ex(){let t=0;$$('#exlist .exrow').forEach(r=>{const i=r.querySelectorAll('input');t+=(+i[1].value||0)*(+i[2].value||0)});$('#ex-total').textContent=$$$(t)}
+$('#exadd').onclick=()=>{exRow();ex()};$('#exclear').onclick=()=>{$('#exlist').innerHTML='';ex()};
+exRow('Fuel',1,0);exRow('Equipment',1,0);
+
+/* Schedule */
+const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const SK='protech-schedule-v1';
+function sRow(n,c=[]){const tr=document.createElement('tr'),a=document.createElement('td');a.className='name';a.contentEditable=true;a.textContent=n;tr.appendChild(a);days.forEach((_,i)=>{const t=document.createElement('td');t.contentEditable=true;t.textContent=c[i]||'';tr.appendChild(t)});$('#sch').appendChild(tr)}
+function sSave(){try{localStorage.setItem(SK,JSON.stringify($$('#sch tr:not(:first-child)').map(r=>[...r.children].map(td=>td.textContent))))}catch(e){}}
+$('#sch').innerHTML='<tr><th>Employee</th>'+days.map(d=>`<th>${d}</th>`).join('')+'</tr>';
+let saved=null;try{saved=JSON.parse(localStorage.getItem(SK))}catch(e){}
+(Array.isArray(saved)&&saved.length?saved:['Employee 1','Employee 2','Employee 3','Employee 4'].map(n=>[n])).forEach(r=>sRow(r[0],r.slice(1)));
+$('#sch').addEventListener('input',sSave);
+$('#sadd').onclick=()=>{sRow('New employee');sSave()};
+$('#sdel').onclick=()=>{const r=$$('#sch tr:not(:first-child)');if(r.length>1){r[r.length-1].remove();sSave()}};
+$('#sclear').onclick=()=>{$$('#sch tr:not(:first-child) td:not(.name)').forEach(td=>td.textContent='');sSave()};
+
+/* Storage + helpers */
+const ls={get:(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* Activity feed */
+function drawLog(){const a=ls.get('protech-log',[]);$('#a-list').innerHTML=a.length?a.map(x=>`<div class='item'><div class='grow'>${esc(x[1])}<small>${new Date(x[0]).toLocaleString()}</small></div></div>`).join(''):`<div class='empty'>Nothing yet. Actions you take will show up here.</div>`}
+function log(m){const a=ls.get('protech-log',[]);a.unshift([Date.now(),m]);ls.set('protech-log',a.slice(0,100));drawLog()}
+$('#a-clear').onclick=()=>{ls.set('protech-log',[]);drawLog()};
+const copyLog={'w-out':'Copied a welcome email','d-out':'Copied a handbook declaration','b-msg':'Copied a broadcast message'};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(b)log(copyLog[b.dataset.copy]||'Copied text')});
+let schT;$('#sch').addEventListener('input',()=>{clearTimeout(schT);schT=setTimeout(()=>log('Schedule updated'),2000)});
+
+/* Theme switcher */
+const themes={red:['#e11d2e','#ff4d5e','#6b0a14','225,29,46','160,10,30','255,120,130'],blue:['#2563eb','#60a5fa','#0b2a6b','37,99,235','20,50,160','120,170,255'],green:['#16a34a','#4ade80','#064e24','22,163,74','10,110,50','110,230,150'],violet:['#7c3aed','#a78bfa','#32126b','124,58,237','80,30,170','180,150,255'],gold:['#d99a0b','#fbbf24','#6b4a04','217,154,11','150,100,5','255,200,90']};
+function theme(n,quiet){if(!themes[n])n='red';const t=themes[n],s=document.documentElement.style;['--red','--red2','--deep','--g1','--g2','--g3'].forEach((k,i)=>s.setProperty(k,t[i]));ls.set('protech-theme',n);$$('#sw button').forEach(b=>b.classList.toggle('on',b.dataset.n===n));if(!quiet)log('Theme changed to '+n)}
+$('#sw').innerHTML=Object.keys(themes).map(n=>`<button data-n='${n}' title='${n}' aria-label='${n} theme' style='background:${themes[n][0]}'></button>`).join('');
+$('#sw').onclick=e=>{const b=e.target.closest('button');if(b)theme(b.dataset.n)};
+
+/* Document vault */
+let V=ls.get('protech-vault',null);
+if(!V){V=[{t:'Division handbook',c:'Handbooks',u:''},{t:'Code of conduct',c:'Policies',u:''},{t:'Use of Force policy',c:'Policies',u:''},{t:'Leave request form',c:'Forms',u:''},{t:'Trainee onboarding guide',c:'Training',u:''}];ls.set('protech-vault',V)}
+let vc='All';
+function drawV(){const q=$('#v-q').value.toLowerCase(),cats=['All',...new Set(V.map(d=>d.c))];if(!cats.includes(vc))vc='All';
+$('#v-chips').innerHTML=cats.map(c=>`<button class='chip${c===vc?' on':''}' data-c='${esc(c)}'>${esc(c)}</button>`).join('');
+const r=V.map((d,i)=>[d,i]).filter(([d])=>(vc==='All'||d.c===vc)&&d.t.toLowerCase().includes(q));
+$('#v-list').innerHTML=r.length?r.map(([d,i])=>`<div class='item'><div class='grow'><b>${esc(d.t)}</b><small>${esc(d.c)}</small></div>${d.u?`<a class='btn ghost' href='${esc(d.u)}' target='_blank' rel='noopener'>Open</a>`:`<small>No link yet</small>`}<button class='xbtn' data-i='${i}' aria-label='Remove'>✕</button></div>`).join(''):`<div class='empty'>No documents match.</div>`}
+$('#v-q').addEventListener('input',drawV);
+$('#v-chips').onclick=e=>{const b=e.target.closest('.chip');if(b){vc=b.dataset.c;drawV()}};
+$('#v-add').onclick=()=>{const t=$('#v-t').value.trim(),u=$('#v-u').value.trim();if(!t){toast('Add a title first');return}if(u&&!/^https?:[/][/]/i.test(u)){toast('Link must start with https://');return}V.push({t,c:$('#v-c').value,u});ls.set('protech-vault',V);$('#v-t').value=$('#v-u').value='';drawV();log('Added document: '+t)};
+$('#v-list').onclick=e=>{const b=e.target.closest('[data-i]');if(b){const d=V.splice(+b.dataset.i,1)[0];ls.set('protech-vault',V);drawV();log('Removed document: '+d.t)}};
+
+/* Request inbox */
+let R=ls.get('protech-requests',[]);const STAT=['New','Under review','Planned','Done','Declined'];
+function drawR(){$('#r-count').textContent=R.length?R.filter(r=>r.s==='New').length+' new of '+R.length+' total':'No requests yet.';
+$('#r-list').innerHTML=R.length?R.map((r,i)=>`<div class='item'><div class='grow'><b>${esc(r.t)}</b><small>From ${esc(r.f)} on ${new Date(r.at).toLocaleDateString()}</small><small>${esc(r.d)}</small></div><select data-s='${i}' style='width:130px' aria-label='Status'>${STAT.map(s=>`<option${s===r.s?' selected':''}>${s}</option>`).join('')}</select><button class='xbtn' data-x='${i}' aria-label='Remove'>✕</button></div>`).join(''):`<div class='empty'>Nothing here. New requests will appear in this list.</div>`}
+$('#r-add').onclick=()=>{const f=$('#r-from').value.trim(),d=$('#r-det').value.trim();if(!f||!d){toast('Add a name and details');return}R.unshift({t:$('#r-type').value,f,d,s:'New',at:Date.now()});ls.set('protech-requests',R);$('#r-from').value=$('#r-det').value='';drawR();log('New '+R[0].t.toLowerCase()+' from '+f)};
+$('#r-list').addEventListener('change',e=>{const i=e.target.dataset.s;if(i==null)return;R[i].s=e.target.value;ls.set('protech-requests',R);drawR();log(R[i].f+'’s '+R[i].t.toLowerCase()+': '+R[i].s)});
+$('#r-list').addEventListener('click',e=>{const b=e.target.closest('[data-x]');if(b){R.splice(+b.dataset.x,1);ls.set('protech-requests',R);drawR()}});
+
+/* Discord broadcast */
+const bs=ls.get('protech-broadcast',{});$('#b-hook').value=bs.hook||'';$('#b-user').value=bs.user||'ProTech Command';
+function bp(){const p=$('#b-prev');p.textContent='';const t=$('#b-title').value;if(t){const b=document.createElement('b');b.textContent=t;b.style.display='block';p.appendChild(b)}const m=document.createElement('div');m.style.whiteSpace='pre-wrap';m.textContent=$('#b-msg').value||'Your message will appear here.';p.appendChild(m)}
+['#b-title','#b-msg'].forEach(s=>$(s).addEventListener('input',bp));bp();
+$('#b-send').onclick=()=>{const hook=$('#b-hook').value.trim(),msg=$('#b-msg').value.trim(),title=$('#b-title').value.trim(),out=$('#b-stat');
+if(!/^https:[/][/](discord|discordapp)[.]com[/]api[/]webhooks[/]/.test(hook)){out.textContent='Enter a valid Discord webhook URL.';return}
+if(!msg){out.textContent='Write a message first.';return}
+ls.set('protech-broadcast',{hook,user:$('#b-user').value});
+const color=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--red').trim().slice(1),16),body={username:$('#b-user').value||'ProTech Command'};
+if(title)body.embeds=[{title,description:msg,color}];else body.content=msg;
+out.textContent='Sending…';
+fetch(hook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>{if(!r.ok)throw 0;out.textContent='Sent.';toast('Broadcast sent');log('Broadcast sent'+($('#b-chan').value?' to '+$('#b-chan').value:''))}).catch(()=>{out.textContent='Couldn’t send. Check the webhook URL. Sending also only works once the dashboard is hosted on your own site, because this preview page blocks outside requests.'})};
+
+/* Plans board */
+let B=ls.get('protech-plans',null);
+if(!B){B=[{t:'To do',c:[{t:'Draft the training plan',l:2},{t:'Collect handbook feedback',l:0}]},{t:'In progress',c:[{t:'Update welcome email wording',l:3}]},{t:'Review',c:[]},{t:'Done',c:[{t:'Launch the dashboard',l:4}]}];ls.set('protech-plans',B)}
+const LAB=['','#ef4444','#f59e0b','#22c55e','#3b82f6'],board=$('#board'),sv=()=>ls.set('protech-plans',B);let dg=null;
+function drawB(){board.innerHTML=B.map((col,ci)=>`<div class='col glass' data-ci='${ci}'><div class='chd'><input value='${esc(col.t)}' data-ct='${ci}' aria-label='Column name'><span>${col.c.length}</span><button class='xbtn' data-cd='${ci}' aria-label='Delete column'>\u2715</button></div><div class='cards' data-ci='${ci}'>${col.c.map((k,ki)=>`<div class='tcard' draggable='true' data-ci='${ci}' data-ki='${ki}' style='--lc:${LAB[k.l]||'transparent'}'><div class='tx' contenteditable data-kt='${ci}:${ki}'>${esc(k.t)}</div><button class='xbtn' data-kl='${ci}:${ki}' aria-label='Change label' style='color:${LAB[k.l]||'inherit'}'>\u25CF</button><button class='xbtn' data-km='${ci}:${ki}:-1' aria-label='Move left'>\u2039</button><button class='xbtn' data-km='${ci}:${ki}:1' aria-label='Move right'>\u203A</button><button class='xbtn' data-kd='${ci}:${ki}' aria-label='Delete card'>\u2715</button></div>`).join('')}</div><div class='addc'><input placeholder='Add a card' data-ka='${ci}' aria-label='Add a card'><button class='btn' data-kb='${ci}'>Add</button></div></div>`).join('')+`<div class='col glass' style='width:240px'><div class='addc' style='margin:0'><input id='newcol' placeholder='New column' aria-label='New column'><button class='btn' id='addcol'>Add</button></div></div>`}
+function mv(a,b,to,pos){const k=B[a].c.splice(b,1)[0];B[to].c.splice(pos==null?B[to].c.length:pos,0,k);sv();drawB()}
+function addCard(ci){const i=$(`[data-ka='${ci}']`),v=i.value.trim();if(!v)return;B[ci].c.push({t:v,l:0});sv();drawB();log('Added a card to '+B[ci].t);$(`[data-ka='${ci}']`).focus()}
+function addCol(){const v=$('#newcol').value.trim();if(!v)return;B.push({t:v,c:[]});sv();drawB();log('Added column: '+v)}
+board.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+if(b.id==='addcol')return addCol();
+if(d.kb!=null)return addCard(+d.kb);
+if(d.cd!=null){const ci=+d.cd;if(B[ci].c.length&&!d.armed){b.dataset.armed=1;toast('Click again to delete this column and its cards');return}log('Deleted column: '+B[ci].t);B.splice(ci,1);sv();return drawB()}
+const s=d.kl||d.km||d.kd;if(!s)return;const p=s.split(':').map(Number),ci=p[0],ki=p[1];
+if(d.kl){const k=B[ci].c[ki];k.l=((k.l||0)+1)%LAB.length;sv();return drawB()}
+if(d.kd){B[ci].c.splice(ki,1);sv();return drawB()}
+const to=ci+p[2];if(to<0||to>=B.length){toast('No column that way');return}mv(ci,ki,to);log('Moved a card to '+B[to].t)});
+board.addEventListener('change',e=>{if(e.target.dataset.ct!=null){B[+e.target.dataset.ct].t=e.target.value.trim()||'Untitled';sv()}});
+board.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target;if(t.dataset.ka!=null)addCard(+t.dataset.ka);else if(t.id==='newcol')addCol();else if(t.dataset.kt!=null){e.preventDefault();t.blur()}});
+board.addEventListener('focusin',e=>{if(e.target.dataset.kt!=null)e.target.parentElement.draggable=false});
+board.addEventListener('focusout',e=>{const t=e.target;if(t.dataset.kt==null)return;t.parentElement.draggable=true;const p=t.dataset.kt.split(':').map(Number),k=B[p[0]]&&B[p[0]].c[p[1]];if(k){k.t=t.textContent.trim()||'Untitled';sv()}});
+board.addEventListener('dragstart',e=>{const k=e.target.closest('.tcard');if(!k)return;dg=[+k.dataset.ci,+k.dataset.ki];e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','card')});
+board.addEventListener('dragover',e=>{if(dg)e.preventDefault()});
+board.addEventListener('drop',e=>{const c=e.target.closest('[data-ci]');if(!dg||!c)return;const holder=c.closest('.col');if(!holder)return;e.preventDefault();const to=+holder.dataset.ci,els=[...holder.querySelectorAll('.tcard')];let pos=els.findIndex(x=>{const r=x.getBoundingClientRect();return e.clientY<r.top+r.height/2});if(pos<0)pos=els.length;if(dg[0]===to&&dg[1]<pos)pos--;const from=dg[0];mv(dg[0],dg[1],to,pos);if(from!==to)log('Moved a card to '+B[to].t);dg=null});
+board.addEventListener('dragend',()=>{dg=null});
+
+/* Command palette */
+const pal=$('#pal'),pq=$('#p-q'),pl=$('#p-list');let pi=0,pit=[];
+function pDraw(){const q=pq.value.toLowerCase();pit=[...tabs.map(t=>[t[1],()=>show(t[0])]),...Object.keys(themes).map(n=>['Theme: '+n,()=>theme(n)])].filter(x=>x[0].toLowerCase().includes(q));pi=Math.min(pi,Math.max(0,pit.length-1));pl.innerHTML=pit.map((x,i)=>`<li class='${i===pi?'sel':''}' data-i='${i}'>${esc(x[0])}</li>`).join('')||`<li>No matches</li>`}
+function pOpen(o){pal.classList.toggle('on',o);if(o){pq.value='';pi=0;pDraw();pq.focus()}}
+function pRun(i){const x=pit[i];if(x){pOpen(false);x[1]()}}
+pq.addEventListener('input',()=>{pi=0;pDraw()});
+pq.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){pi=Math.min(pi+1,pit.length-1);pDraw();e.preventDefault()}else if(e.key==='ArrowUp'){pi=Math.max(pi-1,0);pDraw();e.preventDefault()}else if(e.key==='Enter')pRun(pi)});
+pl.onclick=e=>{const li=e.target.closest('[data-i]');if(li)pRun(+li.dataset.i)};
+pal.onclick=e=>{if(e.target===pal)pOpen(false)};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();pOpen(true)}else if(e.key==='Escape')pOpen(false)});
+$('#kbtn').onclick=()=>pOpen(true);
+
+theme(ls.get('protech-theme','red'),true);drawV();drawR();drawLog();drawB();
+const h=(location.hash||'').slice(1);show(tabs.some(t=>t[0]===h)?h:'welcome');
+</script>
+</body>
+</html>
